@@ -45,7 +45,7 @@ jobs:
         run: doxygen ${{github.workspace}}/build/Doxyfile
 
       - name: Copy files to _site
-        run: cp -r docs ${{runner.workspace}}/docs/_site/
+        run: cp -r docs ./docs/_site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

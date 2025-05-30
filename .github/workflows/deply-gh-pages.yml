@@ -34,18 +34,21 @@ jobs:
                 -DENABLE_ZOLTAN=OFF \
                 -DIS_TESTING=OFF \
                 -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/install
+      
+      - name: Build
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./docs/_site
 
       - name: Generate Doc
         run: doxygen ${{github.workspace}}/build/Doxyfile
 
-      - name: Commit and push if documentation changed
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git add docs/html
-          if ! git diff --cached --quiet; then
-            git commit -m "Update Doxygen documentation"
-            git push origin yus/add_doxygen_test
-          else
-            echo "No documentation changes to commit."
-          fi
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs/_site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

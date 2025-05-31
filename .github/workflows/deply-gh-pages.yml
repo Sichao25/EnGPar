@@ -40,19 +40,19 @@ jobs:
       - name: Build
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./docs
-          destination: ./docs/_site
+          source: docs
+          destination: _site
 
       - name: Generate Doc
         run: doxygen ${{github.workspace}}/build/Doxyfile
 
       - name: Copy files to _site
-        run: cp -r docs/html ./docs/_site
+        run: cp -r docs/html _site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs/_site
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment

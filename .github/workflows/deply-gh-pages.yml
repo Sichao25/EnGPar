@@ -5,13 +5,14 @@ on:
     branches:
       - yus/add_doxygen_test
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:

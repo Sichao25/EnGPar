@@ -6,7 +6,7 @@ on:
       - yus/add_doxygen_test
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -54,6 +54,12 @@ jobs:
         with:
           path: ./docs/_site
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+    environment:
+      name: github-pages

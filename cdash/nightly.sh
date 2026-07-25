@@ -1,37 +1,37 @@
 #!/bin/bash -x
 
-#load system modules
-source /etc/profile.d/modules.sh
-source /etc/profile
-
-module load gcc cmake mpich
-module load pumi
-cd /lore/diamog/cdash/repos/EnGPar
-
-#update this repo
-git pull
-
-#update the mesh and graph repos
-git submodule update
+(
 
 #cdash output root
-cd /lore/diamog/cdash
+d=/users/d_zxg06726/nightlyBuilds/EnGPar_build
+exec > $d/nightly_log.txt 2>&1
 
-#remove old compilation
-rm -rf build/
+source /etc/profile
+# source /users/d_zxg06726/.bash_profile
 
-#run nightly test script
-ctest -VV -D Nightly -S /lore/diamog/cdash/repos/EnGPar/cdash/nightly.cmake
+#setup lmod
+export PATH=/usr/share/lmod/lmod/libexec:$PATH
 
-#EnGPar repository built by nightly.cmake
-buildDir=/lore/diamog/cdash/build/master/
-[ ! -e ${buildDir} ] && exit 0
-cd $buildDir
+#setup spack modules
+unset MODULEPATH
 
-#build documentation
-make doc
-if [ -d "$PWD/doc/html" ]; then
-    docsdir=/net/web/engpar/
-    rm -r $docsdir/*
-    cp -r doc/html/* $docsdir
-fi
+module use /opt/scorec/spack/rhel9/v0201_4/lmod/linux-rhel9-x86_64/Core/
+module load gcc/12.3.0-iil3lno
+module load mpich/4.1.1-xpoyz4t
+module load cmake/3.26.3-2duxfcd
+
+cd $d
+#remove compilation directories created by previous nightly.cmake runs
+[ -d build ] && rm -rf build/
+
+#install kokkos
+[ ! -d EnGPar-graphs ] && git clone https://github.com/SCOREC/EnGPar-graphs.git
+cd EnGPar-graphs && git pull && cd -
+[ ! -d pumi-meshes ] && git clone https://github.com/SCOREC/pumi-meshes.git
+cd pumi-meshes && git pull && cd -
+
+touch $d/startedCoreNightly
+#run nightly.cmake script
+ctest -V --script $d/nightly.cmake
+touch $d/doneCoreNightly
+)
